@@ -1,26 +1,29 @@
 pipeline {
     agent any
     environment {
-        LOCAL_REGISTRY = "localhost:5000" // Replace with your local registry URL
+        LOCAL_REGISTRY = "localhost:5000"  // Replace with your local registry URL
     }
     stages {
         stage('Checkout') {
-            print "Checkout"
-            checkout {
-                [
-                    $class: 'GitSCM',
-                    branches: [[name: '*/main']], // Replace with your branch name
-                    userRemoteConfigs: [ [
-                        credentialsId: '7b8a8548-fec8-4a17-9334-1c84556d634b', // Replace with your credentials ID
-                        url: 'https://github.com/BitterSweet7/frontbacknext.git'
-                    ]
-
-                    ]
-                ]
-                print "Checkout Success"
+            steps {
+                script {
+                    echo "Checkout started"
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: '*/main']], // Replace with your branch name
+                        userRemoteConfigs: [
+                            [
+                                credentialsId: '7b8a8548-fec8-4a17-9334-1c84556d634b', // Replace with your credentials ID
+                                url: 'https://github.com/BitterSweet7/frontbacknext.git'
+                            ]
+                        ]
+                    ])
+                    echo "Checkout Success"
+                }
             }
         }
-         stage('Build') {
+        
+        stage('Build') {
             steps {
                 script {
                     echo "Building Docker images using docker-compose"
@@ -33,7 +36,8 @@ pipeline {
                 }
             }
         }
-         stage('Test') {
+        
+        stage('Test') {
             steps {
                 script {
                     echo "Running tests using Robot Framework"
