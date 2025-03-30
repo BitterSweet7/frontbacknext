@@ -7,36 +7,27 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    echo "Checkout started"
-                    checkout([
-                        $class: 'GitSCM',
-                        branches: [[name: '*/main']], // Replace with your branch name
-                        userRemoteConfigs: [
-                            [
-                                credentialsId: '7b8a8548-fec8-4a17-9334-1c84556d634b', // Replace with your credentials ID
-                                url: 'https://github.com/BitterSweet7/frontbacknext.git'
-                            ]
-                        ]
-                    ])
+                    echo "Checking out the source code"
+                    checkout scm
                     echo "Checkout Success"
                 }
             }
         }
-        
+
         stage('Build') {
             steps {
                 script {
                     echo "Building Docker images using docker-compose"
-                    
-                    // Ensure Docker Compose is installed
-                    sh 'docker-compose -v'
 
-                    // Build images for backend, frontend, and mongodb
+                    // Ensure Docker Compose is installed
+                    sh 'docker-compose -v' // This will fail if Docker Compose isn't installed
+
+                    // Build images for backend, frontend, and mongodb using docker-compose with compose.yaml
                     sh 'docker-compose -f compose.yaml build'
                 }
             }
         }
-        
+
         stage('Test') {
             steps {
                 script {
@@ -52,6 +43,20 @@ pipeline {
                     sh 'docker-compose -f compose.yaml down'
                 }
             }
+        }
+    }
+
+    post {
+        always {
+            echo 'Cleaning up...'
+            // Clean up any resources (e.g., remove containers, networks, volumes) after the build
+            sh 'docker-compose -f compose.yaml down --volumes --remove-orphans'
+        }
+        success {
+            echo 'Build and tests passed successfully!'
+        }
+        failure {
+            echo 'There were issues with the build or tests.'
         }
     }
 }
