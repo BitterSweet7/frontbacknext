@@ -8,6 +8,7 @@ import { loginRouter } from "./routes/login/route";
 import { tempAccountRouter } from "./routes/tempAccount/route";
 import { tempLoginRouter } from "./routes/loginTemp/route";
 import { historicalLoginRouter} from "./routes/historyLogin/route";
+import usersRouter from "./routes/users";
 dotenv.config();
 
 const app = express();
@@ -27,6 +28,7 @@ app.use("/login", loginRouter);
 app.use("/registration/tempAccount", tempAccountRouter);
 app.use("/registration/tempLogin", tempLoginRouter)
 app.use("/registration/historicalSignin", historicalLoginRouter)
+app.use("/users", usersRouter);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
